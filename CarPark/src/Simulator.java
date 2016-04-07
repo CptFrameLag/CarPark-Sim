@@ -19,9 +19,11 @@ public class Simulator {
     int weekendArrivals = 90; // average number of arriving cars per hour
 
     int enterSpeed = 3; // number of cars that can enter per minute
-    int paymentSpeed = 10; // number of cars that can pay per minute
+    int paymentSpeed = 5; // number of cars that can pay per minute
     int exitSpeed = 9; // number of cars that can leave per minute
-
+    
+    double passHolderRatio = 0.1;
+    
     public Simulator() {
         entranceCarQueue = new CarQueue();
         paymentCarQueue = new CarQueue();
@@ -87,8 +89,17 @@ public class Simulator {
 
         // Add the cars to the back of the queue.
         for (int i = 0; i < numberOfCarsPerMinute; i++) {
-            Car car = new AdHocCar();
-            entranceCarQueue.addCar(car);
+        	Car car;
+        	if(random.nextDouble()>passHolderRatio){
+        		car = new AdHocCar();
+        	}else{
+        		car = new PassHolderCar();
+        	}
+        	
+            if(car!=null){
+            	entranceCarQueue.addCar(car);
+            }
+            
         }
 
         // Remove car from the front of the queue and assign to a parking space.
@@ -115,8 +126,15 @@ public class Simulator {
             if (car == null) {
                 break;
             }
+            
             car.setIsPaying(true);
-            paymentCarQueue.addCar(car);
+            
+            if(car instanceof PassHolderCar){
+            	exitCarQueue.addCar(car);
+            }else{
+            	paymentCarQueue.addCar(car);
+            }
+            
         }
 
         // Let cars pay.
@@ -126,7 +144,7 @@ public class Simulator {
                 break;
             }
             // TODO Handle payment.
-            simulatorView.removeCarAt(car.getLocation());
+            
             exitCarQueue.addCar(car);
         }
 
@@ -136,6 +154,7 @@ public class Simulator {
             if (car == null) {
                 break;
             }
+            simulatorView.removeCarAt(car.getLocation());
             // Bye!
         }
 
