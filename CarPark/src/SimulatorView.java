@@ -18,7 +18,7 @@ public class SimulatorView extends JFrame {
         this.numberOfPlaces = numberOfPlaces;
         cars = new Car[numberOfFloors][numberOfRows][numberOfPlaces];
         this.sim =sim;
-        
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         controlPanel = new JPanel();
         
         JButton oneButton = new JButton("Do 1 Step");
@@ -123,7 +123,7 @@ public class SimulatorView extends JFrame {
                     for (int place = 0; place < getNumberOfPlaces(); place++) {
                         Location location = new Location(floor, row, place);
                         Car car = getCarAt(location);
-                        if (car != null && car.getMinutesLeft() <= 0) {
+                        if (car != null && car.getMinutesLeft() <= 0 && !car.getIsPaying()) {
                             return car;
                         }
                     }
