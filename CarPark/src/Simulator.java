@@ -10,7 +10,9 @@ public class Simulator {
     private int minute = 0;
 
     private int tickPause = 100;
-
+    
+    private int stepsToDo = 0;
+    
     int weekDayArrivals= 50; // average number of cars per hour
     int weekendArrivals = 90; // average number of cars per hour
 
@@ -19,14 +21,35 @@ public class Simulator {
 
     public Simulator() {
         entranceCarQueue = new CarQueue();
-        simulatorView = new SimulatorView(3, 6, 30);
+        simulatorView = new SimulatorView(3, 6, 30, this);
     }
 
     public void run(int simulationLength) {
-        for (int i = 0; i < simulationLength; i++) {
-            tick();
+    	stepsToDo += simulationLength;
+        while(true) {
+        	if(stepsToDo>0){
+        		tick();
+        		stepsToDo--;
+        	}else{
+        		try {
+                    Thread.sleep(tickPause);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+        	}
+            
+            
         }
     }
+    
+    public void doOneStep(){
+    	stepsToDo++;
+    }
+    
+    public void doHundredSteps(){
+    	stepsToDo += 100;
+    }
+    
 
     private void tick() {
         // Advance the time by one minute.

@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class SimulatorView extends JFrame {
     private CarParkView carParkView;
@@ -7,21 +9,47 @@ public class SimulatorView extends JFrame {
     private int numberOfRows;
     private int numberOfPlaces;
     private Car[][][] cars;
+    private Simulator sim;
+    private JPanel controlPanel;
 
-    public SimulatorView(int numberOfFloors, int numberOfRows, int numberOfPlaces) {
+    public SimulatorView(int numberOfFloors, int numberOfRows, int numberOfPlaces, Simulator sim) {
         this.numberOfFloors = numberOfFloors;
         this.numberOfRows = numberOfRows;
         this.numberOfPlaces = numberOfPlaces;
         cars = new Car[numberOfFloors][numberOfRows][numberOfPlaces];
+        this.sim =sim;
+        
+        controlPanel = new JPanel();
+        
+        JButton oneButton = new JButton("Do 1 Step");
+        JButton hundredButton = new JButton("Do 100 Steps");
+        
+        ActionListener oneButtonAction = new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		sim.doOneStep();
+        	}
+        };
+        
+        ActionListener hundredButtonAction = new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		sim.doHundredSteps();
+        	}
+        };
+        
+        oneButton.addActionListener(oneButtonAction);
+        hundredButton.addActionListener(hundredButtonAction);
+        controlPanel.add(oneButton);
+        controlPanel.add(hundredButton);
+        
         
         carParkView = new CarParkView();
-
         Container contentPane = getContentPane();
+        contentPane.add(controlPanel, BorderLayout.NORTH);
         //contentPane.add(stepLabel, BorderLayout.NORTH);
         contentPane.add(carParkView, BorderLayout.CENTER);
         //contentPane.add(population, BorderLayout.SOUTH);
-        pack();
-        setVisible(true);
+        this.setSize(1000, 500);
+        this.setVisible(true);
 
         updateView();
     }
