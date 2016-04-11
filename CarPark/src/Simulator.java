@@ -6,7 +6,8 @@ public class Simulator {
     private CarQueue paymentCarQueue;
     private CarQueue exitCarQueue;
     private SimulatorView simulatorView;
-
+    private LocationManager locman;
+    
     private int day = 0;
     private int hour = 0;
     private int minute = 0;
@@ -15,6 +16,10 @@ public class Simulator {
 
     private int tickPause = 100;
 
+    int numberOfFloors = 3;
+    int numberOfRows = 6;
+    int numberOfPlaces = 30;
+    
     int weekDayArrivals= 50; // average number of arriving cars per hour
     int weekendArrivals = 90; // average number of arriving cars per hour
 
@@ -24,15 +29,21 @@ public class Simulator {
     
     double passHolderRatio = 0.1;
     
+    
+    
     public Simulator() {
         entranceCarQueue = new CarQueue();
         paymentCarQueue = new CarQueue();
         exitCarQueue = new CarQueue();
-        simulatorView = new SimulatorView(3, 6, 30, this);
+        locman = new LocationManager(this);
+        stepsToDo += 100;
+        simulatorView = new SimulatorView(this);
+        
+        
     }
 
-    public void run(int simulationLength) {
-    	stepsToDo += simulationLength;
+    public void run() {
+    	
         while(true) {
         	if(stepsToDo>0){
         		tick();
@@ -52,8 +63,30 @@ public class Simulator {
         }
     }
     
+    public LocationManager getLocations(){
+    	return locman;
+    }
+    
+    public int getNumberOfFloors(){
+    	return numberOfFloors;
+    }
+    public int getNumberOfRows(){
+    	return numberOfRows;
+    }
+    public int getNumberOfPlaces(){
+    	return numberOfPlaces;
+    }
+    public int getStepsToDo(){
+    	return stepsToDo;
+    }
+    
+   
     public void doOneStep(){
     	stepsToDo++;
+    }
+    
+    public void doTenSteps(){
+    	stepsToDo +=10;
     }
     
     public void doHundredSteps(){
@@ -108,21 +141,21 @@ public class Simulator {
             if (car == null) {
                 break;
             }
-            // Find a space for this car.
-            Location freeLocation = simulatorView.getFirstFreeLocation();
+
+            Location freeLocation = locman.getFirstFreeLocation();
             if (freeLocation != null) {
-                simulatorView.setCarAt(freeLocation, car);
+                locman.setCarAt(freeLocation, car);
                 int stayMinutes = (int) (15 + random.nextFloat() * 10 * 60);
                 car.setMinutesLeft(stayMinutes);
             }
         }
 
         // Perform car park tick.
-        simulatorView.tick();
+        locman.tick();
 
         // Add leaving cars to the exit queue.
         while (true) {
-            Car car = simulatorView.getFirstLeavingCar();
+            Car car = locman.getFirstLeavingCar();
             if (car == null) {
                 break;
             }
@@ -154,7 +187,7 @@ public class Simulator {
             if (car == null) {
                 break;
             }
-            simulatorView.removeCarAt(car.getLocation());
+            locman.removeCarAt(car.getLocation());
             // Bye!
         }
 

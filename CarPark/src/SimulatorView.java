@@ -3,30 +3,38 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+//This is the controlling View, this one has buttons but no display, it is used to control the simulation, not display it
+
 public class SimulatorView extends JFrame {
     private CarParkView carParkView;
-    private int numberOfFloors;
-    private int numberOfRows;
-    private int numberOfPlaces;
-    private Car[][][] cars;
     private Simulator sim;
     private JPanel controlPanel;
-
-    public SimulatorView(int numberOfFloors, int numberOfRows, int numberOfPlaces, Simulator sim) {
-        this.numberOfFloors = numberOfFloors;
-        this.numberOfRows = numberOfRows;
-        this.numberOfPlaces = numberOfPlaces;
-        cars = new Car[numberOfFloors][numberOfRows][numberOfPlaces];
-        this.sim =sim;
+    private JLabel stepsToDo;
+    
+    
+    public SimulatorView(Simulator sim) {
+        this.sim=sim;
+        
+        
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         controlPanel = new JPanel();
         
         JButton oneButton = new JButton("Do 1 Step");
+        JButton tenButton = new JButton("Do 10 Steps");
         JButton hundredButton = new JButton("Do 100 Steps");
+        stepsToDo = new JLabel("Steps to do: "+sim.getStepsToDo());
+        
+        
         
         ActionListener oneButtonAction = new ActionListener(){
         	public void actionPerformed(ActionEvent e){
         		sim.doOneStep();
+        	}
+        };
+        
+        ActionListener tenButtonAction = new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		sim.doTenSteps();
         	}
         };
         
@@ -37,12 +45,15 @@ public class SimulatorView extends JFrame {
         };
         
         oneButton.addActionListener(oneButtonAction);
+        tenButton.addActionListener(tenButtonAction);
         hundredButton.addActionListener(hundredButtonAction);
         controlPanel.add(oneButton);
+        controlPanel.add(tenButton);
         controlPanel.add(hundredButton);
+        controlPanel.add(stepsToDo);
         
         
-        carParkView = new CarParkView();
+        carParkView = new CarParkView(sim);
         Container contentPane = getContentPane();
         contentPane.add(controlPanel, BorderLayout.NORTH);
         //contentPane.add(stepLabel, BorderLayout.NORTH);
@@ -56,116 +67,24 @@ public class SimulatorView extends JFrame {
 
     public void updateView() {
         carParkView.updateView();
+        stepsToDo.setText("Steps to do: "+sim.getStepsToDo());
     }
     
-     public int getNumberOfFloors() {
-            return numberOfFloors;
-        }
+     
     
-        public int getNumberOfRows() {
-            return numberOfRows;
-        }
-    
-        public int getNumberOfPlaces() {
-            return numberOfPlaces;
-        }
-    
-        public Car getCarAt(Location location) {
-            if (!locationIsValid(location)) {
-                return null;
-            }
-            return cars[location.getFloor()][location.getRow()][location.getPlace()];
-        }
-    
-        public boolean setCarAt(Location location, Car car) {
-            if (!locationIsValid(location)) {
-                return false;
-            }
-            Car oldCar = getCarAt(location);
-            if (oldCar == null) {
-                cars[location.getFloor()][location.getRow()][location.getPlace()] = car;
-                car.setLocation(location);
-                return true;
-            }
-            return false;
-        }
-    
-        public Car removeCarAt(Location location) {
-            if (!locationIsValid(location)) {
-                return null;
-            }
-            Car car = getCarAt(location);
-            if (car == null) {
-                return null;
-            }
-            cars[location.getFloor()][location.getRow()][location.getPlace()] = null;
-            car.setLocation(null);
-            return car;
-        }
-    
-        public Location getFirstFreeLocation() {
-            for (int floor = 0; floor < getNumberOfFloors(); floor++) {
-                for (int row = 0; row < getNumberOfRows(); row++) {
-                    for (int place = 0; place < getNumberOfPlaces(); place++) {
-                        Location location = new Location(floor, row, place);
-                        if (getCarAt(location) == null) {
-                            return location;
-                        }
-                    }
-                }
-            }
-            return null;
-        }
-    
-        public Car getFirstLeavingCar() {
-            for (int floor = 0; floor < getNumberOfFloors(); floor++) {
-                for (int row = 0; row < getNumberOfRows(); row++) {
-                    for (int place = 0; place < getNumberOfPlaces(); place++) {
-                        Location location = new Location(floor, row, place);
-                        Car car = getCarAt(location);
-                        if (car != null && car.getMinutesLeft() <= 0 && !car.getIsPaying()) {
-                            return car;
-                        }
-                    }
-                }
-            }
-            return null;
-        }
-    
-        public void tick() {
-            for (int floor = 0; floor < getNumberOfFloors(); floor++) {
-                for (int row = 0; row < getNumberOfRows(); row++) {
-                    for (int place = 0; place < getNumberOfPlaces(); place++) {
-                        Location location = new Location(floor, row, place);
-                        Car car = getCarAt(location);
-                        if (car != null) {
-                            car.tick();
-                        }
-                    }
-                }
-            }
-        }
-    
-        private boolean locationIsValid(Location location) {
-            int floor = location.getFloor();
-            int row = location.getRow();
-            int place = location.getPlace();
-            if (floor < 0 || floor >= numberOfFloors || row < 0 || row > numberOfRows || place < 0 || place > numberOfPlaces) {
-                return false;
-            }
-            return true;
-        }
     
     private class CarParkView extends JPanel {
         
         private Dimension size;
-        private Image carParkImage;    
+        private Image carParkImage;
+        private Simulator sim;
     
         /**
          * Constructor for objects of class CarPark
          */
-        public CarParkView() {
+        public CarParkView(Simulator sim) {
             size = new Dimension(0, 0);
+            this.sim = sim;
         }
     
         /**
@@ -201,11 +120,11 @@ public class SimulatorView extends JFrame {
                 carParkImage = createImage(size.width, size.height);
             }
             Graphics graphics = carParkImage.getGraphics();
-            for(int floor = 0; floor < getNumberOfFloors(); floor++) {
-                for(int row = 0; row < getNumberOfRows(); row++) {
-                    for(int place = 0; place < getNumberOfPlaces(); place++) {
+            for(int floor = 0; floor < sim.getNumberOfFloors(); floor++) {
+                for(int row = 0; row < sim.getNumberOfRows(); row++) {
+                    for(int place = 0; place < sim.getNumberOfPlaces(); place++) {
                         Location location = new Location(floor, row, place);
-                        Car car = getCarAt(location);
+                        Car car = sim.getLocations().getCarAt(location);
                         Color color = Color.white;
                         if(car!=null){
                         	if(car instanceof PassHolderCar){
