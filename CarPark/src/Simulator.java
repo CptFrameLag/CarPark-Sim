@@ -94,6 +94,10 @@ public class Simulator {
     public void doHundredSteps(){
     	stepsToDo += 100;
     }
+    
+    public void addLiveView(){
+    	views.add(new CarParkLiveView(this));
+    }
 
     private void tick() {
         // Advance the time by one minute.
@@ -198,7 +202,13 @@ public class Simulator {
             // Bye!
         }
 
-        // Update the car park view.
+        // Update all the views and the control panel
+        
+        Iterator<AbstractView> viewIt = views.iterator();
+        while(viewIt.hasNext()){
+        	viewIt.next().updateView();
+        }
+        
         simulatorView.updateView();
 
         // Pause.
