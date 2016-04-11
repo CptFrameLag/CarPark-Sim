@@ -28,7 +28,7 @@ public class Simulator {
     int exitSpeed = 9; // number of cars that can leave per minute
     
     double passHolderRatio = 0.1;
-    
+    double reservationCarRatio = 0.1;
     
     
     public Simulator() {
@@ -122,11 +122,17 @@ public class Simulator {
 
         // Add the cars to the back of the queue.
         for (int i = 0; i < numberOfCarsPerMinute; i++) {
-        	Car car;
-        	if(random.nextDouble()>passHolderRatio){
-        		car = new AdHocCar();
+        	Car car = new AdHocCar();;
+        	double carGen = random.nextDouble();
+        	if(carGen<=passHolderRatio+reservationCarRatio){
+        		if(carGen<=passHolderRatio){
+        			car = new PassHolderCar(random.nextInt(10000000));
+        		}
+        		if(carGen<=passHolderRatio+reservationCarRatio && carGen>passHolderRatio){
+        			car = new ReservationCar(true);
+        		}
         	}else{
-        		car = new PassHolderCar();
+        		car = new AdHocCar();
         	}
         	
             if(car!=null){
@@ -176,7 +182,6 @@ public class Simulator {
             if (car == null) {
                 break;
             }
-            // TODO Handle payment.
             
             exitCarQueue.addCar(car);
         }

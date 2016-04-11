@@ -1,11 +1,4 @@
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 
 public class LocationManager {
@@ -15,14 +8,13 @@ public class LocationManager {
     private int numberOfRows;
     private int numberOfPlaces;
     private Car[][][] cars;
-    private Simulator sim;
 	
 	 public LocationManager( Simulator sim) {
 	        this.numberOfFloors = sim.getNumberOfFloors();
 	        this.numberOfRows = sim.getNumberOfRows();
 	        this.numberOfPlaces = sim.getNumberOfPlaces();
 	        cars = new Car[numberOfFloors][numberOfRows][numberOfPlaces];
-	        this.sim =sim;
+	        
 
 	    }
 	

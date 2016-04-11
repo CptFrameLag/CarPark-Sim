@@ -130,7 +130,11 @@ public class SimulatorView extends JFrame {
                         	if(car instanceof PassHolderCar){
                         		color = Color.blue;
                         	}else{
-                        		color = Color.red;
+                        		if(car instanceof ReservationCar){
+                        			color = Color.green;
+                        		}else{
+                        			color = Color.red;
+                        		}
                         	}
                         }
                         drawPlace(graphics, location, color);

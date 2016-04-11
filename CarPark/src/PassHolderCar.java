@@ -1,8 +1,14 @@
 
 public class PassHolderCar extends Car {
 	
-	public PassHolderCar(){
-		
+	private int passID;
+	
+	public PassHolderCar(int id){
+		passID = id;
+	}
+	
+	public int getID(){
+		return passID;
 	}
 	
 	
