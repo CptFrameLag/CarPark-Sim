@@ -46,7 +46,7 @@ public class Simulator {
         stepsToDo += 100;
         simulatorView = new SimulatorView(this);
         views = new ArrayList<AbstractView>();
-        views.add(new statisticsView(new Dimension(480,480),this));
+        
         
     }
 
@@ -110,6 +110,12 @@ public class Simulator {
     public void addLiveView(){
     	views.add(new CarParkLiveView(this));
     }
+    
+    public void addStatView(){
+    	views.add(new statisticsView(new Dimension(480,480),this));
+    	
+    }
+    
 
     private void tick() {
         // Advance the time by one minute.
