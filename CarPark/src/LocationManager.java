@@ -20,6 +20,9 @@ public class LocationManager {
 	
 	
 	
+	public Car[][][] getCars() {
+		return cars;
+	}
 	
 	public int getNumberOfFloors() {
         return numberOfFloors;

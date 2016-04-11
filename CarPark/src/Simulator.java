@@ -1,5 +1,7 @@
 import java.util.Random;
 import java.util.*;
+import javax.swing.*;
+import java.awt.*;
 
 public class Simulator {
 
@@ -9,6 +11,9 @@ public class Simulator {
     private SimulatorView simulatorView;
     private LocationManager locman;
     private ArrayList<AbstractView> views;
+    
+    //parking cost per hour in Euro's
+    private int parkingCostPH = 2;
     
     private int day = 0;
     private int hour = 0;
@@ -41,6 +46,7 @@ public class Simulator {
         stepsToDo += 100;
         simulatorView = new SimulatorView(this);
         views = new ArrayList<AbstractView>();
+        views.add(new statisticsView(new Dimension(480,480),this));
         
     }
 
@@ -60,8 +66,6 @@ public class Simulator {
 					}
                
         	}
-            
-            
         }
     }
     
@@ -69,6 +73,14 @@ public class Simulator {
     	return locman;
     }
     
+    public int getRemainingRevenue(){
+    	int remainingRev;
+    	
+    	for(Car tmpCar : locman.getCars()) {
+    		remainingRev += (tmpCar.getMinutesLeft() * parkingCostPH);
+    	}
+    	return 0;
+    }
     public int getNumberOfFloors(){
     	return numberOfFloors;
     }
