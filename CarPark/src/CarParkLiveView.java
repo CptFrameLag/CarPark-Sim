@@ -74,6 +74,10 @@ public class CarParkLiveView extends AbstractView {
                 size = getSize();
                 carParkImage = createImage(size.width, size.height);
             }
+            if(carParkImage == null){
+            	return;
+            }
+            
             Graphics graphics = carParkImage.getGraphics();
             for(int floor = 0; floor < sim.getNumberOfFloors(); floor++) {
                 for(int row = 0; row < sim.getNumberOfRows(); row++) {

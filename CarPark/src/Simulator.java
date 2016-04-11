@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.util.concurrent.locks.*;
 import java.util.*;
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +14,9 @@ public class Simulator {
     private ArrayList<AbstractView> views;
     
     //parking cost per hour in Euro's
+    private Lock lock = new ReentrantLock();
+    private boolean limiter;
+    
     private int parkingCostPH = 2;
     
     private int day = 0;
@@ -39,6 +43,7 @@ public class Simulator {
     
     
     public Simulator() {
+    	limiter = true;
         entranceCarQueue = new CarQueue();
         paymentCarQueue = new CarQueue();
         exitCarQueue = new CarQueue();
@@ -54,8 +59,9 @@ public class Simulator {
     	
         while(true) {
         	if(stepsToDo>0){
-        		tick();
         		stepsToDo--;
+        		tick();
+        		
         	}else{
         		
                     try {
@@ -94,6 +100,14 @@ public class Simulator {
     	return stepsToDo;
     }
     
+    public void toggleLimit(){
+    	if(limiter == true){
+    		limiter = false;
+    	}else{
+    		limiter = true;
+    	}
+    	return;
+    }
    
     public void doOneStep(){
     	stepsToDo++;
@@ -107,13 +121,20 @@ public class Simulator {
     	stepsToDo += 100;
     }
     
+    public void doADay(){
+    	stepsToDo += 1440;
+    }
+    
     public void addLiveView(){
+    	lock.lock();
     	views.add(new CarParkLiveView(this));
+    	lock.unlock();
     }
     
     public void addStatView(){
+    	lock.lock();
     	views.add(new statisticsView(new Dimension(480,480),this));
-    	
+    	lock.unlock();
     }
     
 
@@ -221,19 +242,34 @@ public class Simulator {
         }
 
         // Update all the views and the control panel
+        updateViews();
         
-        Iterator<AbstractView> viewIt = views.iterator();
+
+        // Pause.
+        if(limiter == true){
+	        try {
+	            Thread.sleep(tickPause);
+	        } catch (InterruptedException e) {
+	            e.printStackTrace();
+	        }
+        } /*else{
+        	try {
+	            Thread.sleep(10);
+	        } catch (InterruptedException e) {
+	            e.printStackTrace();
+	        }
+        } */
+    }
+    
+    private void updateViews(){
+    	lock.lock();
+    	Iterator<AbstractView> viewIt = views.iterator();
         while(viewIt.hasNext()){
         	viewIt.next().updateView();
         }
-        
+        lock.unlock();
         simulatorView.updateView();
-
-        // Pause.
-        try {
-            Thread.sleep(tickPause);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        
     }
+    
 }
