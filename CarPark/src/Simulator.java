@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.util.*;
 
 public class Simulator {
 
@@ -7,6 +8,7 @@ public class Simulator {
     private CarQueue exitCarQueue;
     private SimulatorView simulatorView;
     private LocationManager locman;
+    private ArrayList<AbstractView> views;
     
     private int day = 0;
     private int hour = 0;
@@ -38,7 +40,7 @@ public class Simulator {
         locman = new LocationManager(this);
         stepsToDo += 100;
         simulatorView = new SimulatorView(this);
-        
+        views = new ArrayList<AbstractView>();
         
     }
 
