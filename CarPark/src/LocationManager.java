@@ -8,17 +8,21 @@ public class LocationManager {
     private int numberOfRows;
     private int numberOfPlaces;
     private Car[][][] cars;
+    private int freeLocations;
 	
 	 public LocationManager( Simulator sim) {
 	        this.numberOfFloors = sim.getNumberOfFloors();
 	        this.numberOfRows = sim.getNumberOfRows();
 	        this.numberOfPlaces = sim.getNumberOfPlaces();
 	        cars = new Car[numberOfFloors][numberOfRows][numberOfPlaces];
+	        freeLocations = numberOfFloors * numberOfRows * numberOfPlaces;
 	        
 
 	    }
 	
-	
+	public int getFreeSpotsCount(){
+		return freeLocations;
+	}
 	
 	public Car[][][] getCars() {
 		return cars;
@@ -35,6 +39,11 @@ public class LocationManager {
     public int getNumberOfPlaces() {
         return numberOfPlaces;
     }
+    
+    public void reserve(){
+    	freeLocations--;
+    }
+    
 
     public Car getCarAt(Location location) {
         if (!locationIsValid(location)) {
@@ -66,15 +75,20 @@ public class LocationManager {
         }
         cars[location.getFloor()][location.getRow()][location.getPlace()] = null;
         car.setLocation(null);
+        freeLocations++;
         return car;
     }
 
     public Location getFirstFreeLocation() {
+    	if(freeLocations<=0){
+    		return null;
+    	}
         for (int floor = 0; floor < getNumberOfFloors(); floor++) {
             for (int row = 0; row < getNumberOfRows(); row++) {
                 for (int place = 0; place < getNumberOfPlaces(); place++) {
                     Location location = new Location(floor, row, place);
                     if (getCarAt(location) == null) {
+                    	freeLocations--;
                         return location;
                     }
                 }
@@ -82,6 +96,23 @@ public class LocationManager {
         }
         return null;
     }
+    
+    public Location getReservedLocation(){
+    	
+    	for (int floor = 0; floor < getNumberOfFloors(); floor++) {
+            for (int row = 0; row < getNumberOfRows(); row++) {
+                for (int place = 0; place < getNumberOfPlaces(); place++) {
+                    Location location = new Location(floor, row, place);
+                    if (getCarAt(location) == null) {
+                    	
+                        return location;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
 
     public Car getFirstLeavingCar() {
         for (int floor = 0; floor < getNumberOfFloors(); floor++) {

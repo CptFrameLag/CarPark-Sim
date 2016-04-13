@@ -18,7 +18,6 @@ public class CarParkLiveView extends AbstractView {
 		carParkView = new CarParkView(sim);
         Container contentPane = getContentPane();
         contentPane.add(carParkView, BorderLayout.CENTER);
-		
 	}
 	
 	public void updateView() {
