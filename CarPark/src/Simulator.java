@@ -103,7 +103,9 @@ public class Simulator {
 		return paymentCarQueue;
 	}
     
-    
+    public int getHour(){
+    	return hour;
+    }
     public int getNumberOfFloors(){
     	return numberOfFloors;
     }
@@ -151,7 +153,7 @@ public class Simulator {
     
     public void addPieView(){
     	lock.lock();
-    	views.add(new PieView(new Dimension(480,480), this));
+    	views.add(new PieView(new Dimension(480,500), this));
     	lock.unlock();
     }
     

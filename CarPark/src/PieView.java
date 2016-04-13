@@ -1,24 +1,52 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.Image;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
 public class PieView extends AbstractView {
 
-	private int nrNormalCars =0;
-	private int nrReservations =0;
-	private int nrPassholders =0;
+	private Container contentContainer;
+	private JPanel contentPanel;
 	
-	private Image pieImage;
+	private double nrNormalCars =0;
+	private double nrReservations =0;
+	private double nrPassHolders =0;
+	
+	private JLabel ticketHolders;
+	private JLabel resHolders;
+	private JLabel passHolders;
+	
 	
 	public PieView (Dimension size, Simulator sim) {
 		super(size, sim);
-		pieImage = createImage(size.width, size.height);
+		contentContainer = getContentPane();
+		contentPanel = new JPanel();
+		contentPanel.setLayout(null);
+		
+		ticketHolders = new JLabel(" "+ nrNormalCars);
+		resHolders = new JLabel(" "+ nrReservations);
+		passHolders = new JLabel(" "+ nrPassHolders);
+		
+		
+		ticketHolders.setBounds(10, -120, size.width, size.height);
+		resHolders.setBounds(10, 20, size.width, size.height);
+		passHolders.setBounds(10, 160, size.width, size.height);
+		
+		contentPanel.add(ticketHolders);
+		contentPanel.add(resHolders);
+		contentPanel.add(passHolders);
+		
+		contentContainer.add(contentPanel);
 	}
 	
-	@Override public void updateView() {
-		nrPassholders =0;
+	public void updateView() {
+		//Calculate the amount of cars of a specific typ in the car park.
+		nrPassHolders =0;
 		nrReservations =0;
 		nrNormalCars =0;
 		for(Car[][] carFloor : sim.getLocations().getCars()) {
@@ -28,27 +56,28 @@ public class PieView extends AbstractView {
     	                break;
     	            }
                 	if(car instanceof PassHolderCar){
-                		nrPassholders++;
+                		nrPassHolders++;
                 	}else if(car instanceof ReservationCar){
                 		nrReservations++;
                 	}else nrNormalCars++;
             	}
         	}
     	}
-		Graphics graphics = pieImage.getGraphics();
-		paint(graphics);
 		repaint();
+		ticketHolders.setText("Spaces occupied by ticket holders: " + nrNormalCars);
+		resHolders.setText("Spaces occupied by reservation holders: " + nrReservations);
+		passHolders.setText("Spaces occupied by pass holders: " + nrPassHolders);
 	}
 	
-	@Override public void paint(Graphics g) {
-		g.setColor(Color.WHITE);
-		g.fillRect(0, 0, 200, 200);
-		
+	@Override public void paint(Graphics g) {	
 		g.setColor(Color.RED);
-		g.fillArc(0, 10, 100, 100, 0, nrNormalCars);
+		g.fillArc(30, 50, 100, 100, 0, (int)(nrNormalCars*(360/(double)sim.getTotalSpaces())));
+	
 		g.setColor(Color.GREEN);
-		g.fillArc(120, 10, 100, 100, 0, nrReservations);
+		g.fillArc(30, 190, 100, 100, 0, (int)(nrReservations*(360/(double)sim.getTotalSpaces())));
+		
 		g.setColor(Color.BLUE);
-		g.fillArc(240, 10, 100, 100, 0, nrPassholders);
+		g.fillArc(30, 330, 100, 100, 0, (int)(nrPassHolders*(360/(double)sim.getTotalSpaces())));
+		
     }
 }
