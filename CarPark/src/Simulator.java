@@ -9,6 +9,7 @@ public class Simulator {
     private CarQueue entranceCarQueue;
     private CarQueue paymentCarQueue;
     private CarQueue exitCarQueue;
+    private ArrayList<Car> reservations;
     private SimulatorView simulatorView;
     private StatisticsView statView;
     private LocationManager locman;
@@ -34,16 +35,18 @@ public class Simulator {
     int numberOfRows = 6;
     int numberOfPlaces = 30;
     
-    int weekDayArrivals= 100; // average number of arriving cars per hour
-    int weekendArrivals = 180; // average number of arriving cars per hour
+    private int weekDayArrivals= 50; // average number of arriving cars per hour
+    private int weekendArrivals = 90; // average number of arriving cars per hour
 
-    int enterSpeed = 3; // number of cars that can enter per minute
-    int paymentSpeed = 5; // number of cars that can pay per minute
-    int exitSpeed = 9; // number of cars that can leave per minute
+    private int enterSpeed = 3; // number of cars that can enter per minute
+    private int paymentSpeed = 5; // number of cars that can pay per minute
+    private int exitSpeed = 9; // number of cars that can leave per minute
     
-    double passHolderRatio = 0.1;
-    double reservationCarRatio = 0.1;
+    private double passHolderRatio = 0.1;
+    private double reservationCarRatio = 0.1;
+    private double passHolderReservationRatio = 0.2;
 	
+    
     
     
     public Simulator() {
@@ -51,6 +54,7 @@ public class Simulator {
         entranceCarQueue = new CarQueue();
         paymentCarQueue = new CarQueue();
         exitCarQueue = new CarQueue();
+        reservations = new ArrayList<Car>();
         locman = new LocationManager(this);
         stepsToDo += 100;
         simulatorView = new SimulatorView(this);
@@ -100,7 +104,7 @@ public class Simulator {
 		return paymentCarQueue;
 	}
     
-    
+    //Size getters
     public int getNumberOfFloors(){
     	return numberOfFloors;
     }
@@ -110,6 +114,8 @@ public class Simulator {
     public int getNumberOfPlaces(){
     	return numberOfPlaces;
     }
+    
+    //controlpanel getters and functions
     public int getStepsToDo(){
     	return stepsToDo;
     }
@@ -140,10 +146,13 @@ public class Simulator {
     	stepsToDo += 1440;
     }
     
+    
+    
     public void addLiveView(){
     	lock.lock();
     	views.add(new CarParkLiveView(this));
     	lock.unlock();
+    	
     }
     
     public void addStatView(){
@@ -151,8 +160,12 @@ public class Simulator {
     	statView = new StatisticsView(new Dimension(480,480),this);
     	views.add(statView);
     	lock.unlock();
+    	
     }
-
+    
+    
+    
+    
     private void tick() {
         // Advance the time by one minute.
         minute++;
@@ -182,7 +195,10 @@ public class Simulator {
 
         // Add the cars to the back of the queue.
         for (int i = 0; i < numberOfCarsPerMinute; i++) {
-        	Car car = new AdHocCar();;
+        	if(locman.getFreeSpotsCount()<=0){
+        		break;
+        	}
+        	Car car = new AdHocCar();
         	double carGen = random.nextDouble();
         	if(carGen<=passHolderRatio+reservationCarRatio){
         		if(carGen<=passHolderRatio){
@@ -191,15 +207,48 @@ public class Simulator {
         		if(carGen<=passHolderRatio+reservationCarRatio && carGen>passHolderRatio){
         			car = new ReservationCar(true);
         		}
-        	}else{
-        		car = new AdHocCar();
+        	}
+        	if(car == null){
+        		System.err.println("weird shit happenin");
         	}
         	
-            if(car!=null){
+        	if(car instanceof PassHolderCar){
+        		carGen = random.nextDouble();
+        		if(carGen<=passHolderReservationRatio){
+        			car.setReserveTime(random.nextInt(120));
+        			car.setReserved();
+        			reservations.add(car);
+        			locman.reserve();
+        		}else{
+        			entranceCarQueue.addCar(car);
+        		}
+        	}
+        	
+        	if(car instanceof ReservationCar){
+        		car.setReserveTime(random.nextInt(120));
+        		car.setReserved();
+        		reservations.add(car);
+        		locman.reserve();
+        	}
+        	
+            if(car instanceof AdHocCar){
             	entranceCarQueue.addCar(car);
             }
-            
+           
         }
+            
+        
+        for(int i = 0; i< reservations.size(); i++ ){
+        	Car car = reservations.remove(0);
+        	car.rTick();
+        	if(car.getReserveTime()<=0){
+        		entranceCarQueue.addCar(car);
+        	}else{
+        		reservations.add(car);
+        		
+        	}
+        }
+        
 
         // Remove car from the front of the queue and assign to a parking space.
         for (int i = 0; i < enterSpeed; i++) {
@@ -207,8 +256,14 @@ public class Simulator {
             if (car == null) {
                 break;
             }
+            Location freeLocation;
+            if(car.hasReserved()){
+            	freeLocation = locman.getReservedLocation();
+            }else{
+            	freeLocation = locman.getFirstFreeLocation();
+            }
 
-            Location freeLocation = locman.getFirstFreeLocation();
+            
             if (freeLocation != null) {
                 locman.setCarAt(freeLocation, car);
                 int stayMinutes = (int) (15 + random.nextFloat() * 10 * 60);
@@ -234,8 +289,7 @@ public class Simulator {
             }else{
             	paymentCarQueue.addCar(car);
             }
-            System.out.println("payQue"+getPaymentQue().getQueueSize());
-           
+            
         }
 
         // Let cars pay.
@@ -246,7 +300,7 @@ public class Simulator {
             }
             currentRev += car.getMinutesStayed() * parkingCostPH/60;
             exitCarQueue.addCar(car);
-            System.out.println("exitQue"+getExitQue().getQueueSize());
+      
             
         }
 
