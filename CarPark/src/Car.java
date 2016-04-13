@@ -2,6 +2,7 @@ public abstract class Car {
 
     private Location location;
     private int minutesLeft;
+    private int minutesStayed;
     private boolean isPaying;
 
     /**
@@ -37,6 +38,11 @@ public abstract class Car {
 
     public void tick() {
         minutesLeft--;
+        minutesStayed++;
     }
+
+	public int getMinutesStayed() {
+		return minutesStayed;
+	}
 
 }
