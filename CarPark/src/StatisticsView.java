@@ -22,9 +22,9 @@ public class StatisticsView extends AbstractView {
 		//Initiate labels and layout
 		box = Box.createVerticalBox();
 		currentRev = new JLabel("Today's current revenue: "+ sim.getCurrentRev());
-		remainingRev = new JLabel("Current entrance queue size: "+ sim.getEntranceQue().getQueueSize());
-		entranceQueue = new JLabel("Today's current revenue: "+ sim.getCurrentRev());
-		paymentQueu = new JLabel("Today's current revenue: "+ sim.getCurrentRev());
+		remainingRev = new JLabel("Expected remaining revenue: "+ sim.getRemainingRev());
+		entranceQueue = new JLabel("Current entrance queue size: "+ sim.getEntranceQue().getQueueSize());
+		paymentQueu = new JLabel("Current payment queue size: "+ sim.getPaymentQue().getQueueSize());
 		exitQueue = new JLabel("Current exit queue size: "+ sim.getExitQue().getQueueSize());
 		
 

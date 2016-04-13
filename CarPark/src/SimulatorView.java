@@ -51,6 +51,7 @@ public class SimulatorView extends JFrame {
         stepsToDo = new JLabel("Steps to do: "+sim.getStepsToDo());
         JButton liveView =  new JButton("Live View");
         JButton statView = new JButton("Statistics");
+        JButton pieView = new JButton("Pie Statistics");
         JButton limiter = new JButton("Toggle speed limit");
         
         
@@ -70,6 +71,12 @@ public class SimulatorView extends JFrame {
         ActionListener addStatView = new ActionListener(){
         	public void actionPerformed(ActionEvent e){
         		sim.addStatView();
+        	}
+        };
+        
+        ActionListener addPieView = new ActionListener(){
+        	public void actionPerformed(ActionEvent e){
+        		sim.addPieView();
         	}
         };
         
@@ -103,6 +110,7 @@ public class SimulatorView extends JFrame {
         hundredButton.addActionListener(hundredButtonAction);
         liveView.addActionListener(addLiveView);
         statView.addActionListener(addStatView);
+        pieView.addActionListener(addPieView);
         limiter.addActionListener(limitToggle);
         oneDay.addActionListener(doADay);
         controlPanel.add(oneButton);
@@ -113,6 +121,7 @@ public class SimulatorView extends JFrame {
         controlPanel.add(stepsToDo);
         viewPanel.add(liveView);
         viewPanel.add(statView);
+        viewPanel.add(pieView);
     }
     
     

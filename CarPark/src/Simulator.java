@@ -10,7 +10,6 @@ public class Simulator {
     private CarQueue paymentCarQueue;
     private CarQueue exitCarQueue;
     private SimulatorView simulatorView;
-    private StatisticsView statView;
     private LocationManager locman;
     private ArrayList<AbstractView> views;
     
@@ -33,6 +32,7 @@ public class Simulator {
     int numberOfFloors = 3;
     int numberOfRows = 6;
     int numberOfPlaces = 30;
+    int totalSpaces;
     
     int weekDayArrivals= 50; // average number of arriving cars per hour
     int weekendArrivals = 90; // average number of arriving cars per hour
@@ -55,8 +55,7 @@ public class Simulator {
         stepsToDo += 100;
         simulatorView = new SimulatorView(this);
         views = new ArrayList<AbstractView>();
-        
-        
+        totalSpaces = numberOfFloors * (numberOfRows * numberOfPlaces);
     }
 
     public void run() {
@@ -82,7 +81,9 @@ public class Simulator {
     public LocationManager getLocations(){
     	return locman;
     }
-    
+    public int getTotalSpaces() {
+    	return totalSpaces;
+    }
     //Revenue getters
     public double getRemainingRev() {
     	return remainingRev;
@@ -148,13 +149,18 @@ public class Simulator {
     	lock.unlock();
     }
     
-    public void addStatView(){
+    public void addPieView(){
     	lock.lock();
-    	statView = new StatisticsView(new Dimension(480,480),this);
-    	views.add(statView);
+    	views.add(new PieView(new Dimension(480,480), this));
     	lock.unlock();
     }
-
+    
+    public void addStatView(){
+    	lock.lock();
+    	views.add(new StatisticsView(new Dimension(480,480),this));
+    	lock.unlock();
+    }
+    
     private void tick() {
         // Advance the time by one minute.
         minute++;
@@ -236,8 +242,6 @@ public class Simulator {
             }else{
             	paymentCarQueue.addCar(car);
             }
-            System.out.println("payQue"+getPaymentQue().getQueueSize());
-            statView.updateView();
         }
 
         // Let cars pay.
@@ -248,8 +252,6 @@ public class Simulator {
             }
             currentRev += car.getMinutesStayed() * parkingCostPH/60;
             exitCarQueue.addCar(car);
-            System.out.println("exitQue"+getExitQue().getQueueSize());
-            statView.updateView();
         }
 
         // Let cars leave.
@@ -259,7 +261,6 @@ public class Simulator {
                 break;
             }
             locman.removeCarAt(car.getLocation());
-            statView.updateView();
             // Bye!
         }
         
@@ -271,7 +272,6 @@ public class Simulator {
     				if (car == null) {
     	                break;
     	            }
-    				
         			remainingRev += car.getMinutesStayed() * parkingCostPH/60;
             	}
         	}
