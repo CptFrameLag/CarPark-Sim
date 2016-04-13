@@ -34,8 +34,8 @@ public class Simulator {
     int numberOfRows = 6;
     int numberOfPlaces = 30;
     
-    int weekDayArrivals= 50; // average number of arriving cars per hour
-    int weekendArrivals = 90; // average number of arriving cars per hour
+    int weekDayArrivals= 100; // average number of arriving cars per hour
+    int weekendArrivals = 180; // average number of arriving cars per hour
 
     int enterSpeed = 3; // number of cars that can enter per minute
     int paymentSpeed = 5; // number of cars that can pay per minute
@@ -55,8 +55,6 @@ public class Simulator {
         stepsToDo += 100;
         simulatorView = new SimulatorView(this);
         views = new ArrayList<AbstractView>();
-        
-        
     }
 
     public void run() {
@@ -237,7 +235,7 @@ public class Simulator {
             	paymentCarQueue.addCar(car);
             }
             System.out.println("payQue"+getPaymentQue().getQueueSize());
-            statView.updateView();
+           
         }
 
         // Let cars pay.
@@ -249,7 +247,7 @@ public class Simulator {
             currentRev += car.getMinutesStayed() * parkingCostPH/60;
             exitCarQueue.addCar(car);
             System.out.println("exitQue"+getExitQue().getQueueSize());
-            statView.updateView();
+            
         }
 
         // Let cars leave.
@@ -259,7 +257,7 @@ public class Simulator {
                 break;
             }
             locman.removeCarAt(car.getLocation());
-            statView.updateView();
+            
             // Bye!
         }
         
