@@ -60,6 +60,7 @@ public class SimulatorView extends JFrame {
 
         updateView();
     }
+    
 
     public void updateView() {
         stepsToDo.setText("Steps to do: "+sim.getStepsToDo());
