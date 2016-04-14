@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
@@ -12,12 +13,21 @@ import javax.swing.JPanel;
 
 public class CarParkLiveView extends AbstractView {
 	private CarParkView carParkView;
+	private JPanel legendPanel;
 	
 	public CarParkLiveView(Simulator sim){
 		super(new Dimension(1000,500),sim);
 		carParkView = new CarParkView(sim);
+		makeLegendPanel();
         Container contentPane = getContentPane();
         contentPane.add(carParkView, BorderLayout.CENTER);
+        contentPane.add(legendPanel, BorderLayout.SOUTH);
+	}
+	
+	private void makeLegendPanel(){
+		legendPanel = new JPanel();
+		legendPanel.add(new JLabel("Legend:     Red: Normal Car     Green: Car with Reservation     Blue: Car with Parking Pass"));
+		
 	}
 	
 	public void updateView() {

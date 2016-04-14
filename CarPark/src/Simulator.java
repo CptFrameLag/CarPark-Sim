@@ -115,7 +115,7 @@ public class Simulator {
     	return numberOfPlaces;
     }
     
-    //controlpanel getters and functions
+    //controlpanel getter and functions
     public int getStepsToDo(){
     	return stepsToDo;
     }
@@ -144,6 +144,57 @@ public class Simulator {
     
     public void doADay(){
     	stepsToDo += 1440;
+    }
+    
+    public int getWeekDayArrivals(){
+    	return weekDayArrivals;
+    }
+    public int getWeekendArrivals(){
+    	return weekendArrivals; 
+    }
+    public int getEnterSpeed(){
+    	return enterSpeed;
+    }
+    public int getPaymentSpeed(){
+    	return paymentSpeed;
+    }
+    public int getExitSpeed(){
+    	return exitSpeed;
+    }
+    public double getPassHolderRatio(){
+    	return passHolderRatio;
+    }
+    public double getReservationCarRatio(){
+    	return reservationCarRatio;
+    }
+    public double getPassHolderReservationRatio(){
+    	return passHolderReservationRatio;
+    }
+    
+    
+    public void setWeekDayArrivals(int arr){
+    	weekDayArrivals = arr;
+    }
+    public void setWeekendArrivals(int arr){
+    	weekendArrivals = arr;
+    }
+    public void setEnterSpeed(int spd){
+    	enterSpeed = spd;
+    }
+    public void setPaymentSpeed(int spd){
+    	paymentSpeed = spd;
+    }
+    public void setExitSpeed(int spd){
+    	exitSpeed = spd;
+    }
+    public void setPassHolderRatio(double ratio){
+    	passHolderRatio = ratio;
+    }
+    public void setReservationCarRatio(double ratio){
+    	reservationCarRatio = ratio;
+    }
+    public void setPassHolderReservationRatio(double ratio){
+    	passHolderReservationRatio = ratio;
     }
     
     
